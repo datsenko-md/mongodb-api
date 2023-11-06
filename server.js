@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import movieRoutes from './routes/movie-routes.js';
 
 const PORT = 3000;
-const URL = 'mongodb://localhost:27017/moviebox';
+const URL = 'mongodb+srv://<user>:<password>@cluster0.gang369.mongodb.net/moviebox?retryWrites=true&w=majority';
 
 const app = express();
 app.use(express.json());
