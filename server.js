@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 
-import { ObjectId } from 'mongodb';
+import Movie from './models/Movie.js';
 
 const PORT = 3000;
 const URL = 'mongodb://localhost:27017/moviebox';
@@ -13,21 +13,19 @@ mongoose
   .connect(URL)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.log(`DB connection error: ${err}`));
-
-let db;
-
+ 
 const handleError = (res, error) => {
   res.status(500).json({ error });
-}
+};
+  
+app.listen(PORT, (err) => console.log(err ?? `Listening port ${PORT}`));
+
 
 app.get('/movies', (req, res) => {
-  const movies = [];
-  db
-    .collection('movies')
+  Movie
     .find()
     .sort({ title: 1 })
-    .forEach((movie) => movies.push(movie))
-    .then(() => {
+    .then((movies) => {
       res
         .status(200)
         .json(movies);
@@ -36,41 +34,31 @@ app.get('/movies', (req, res) => {
 });
 
 app.get('/movies/:id', (req, res) => {
-  if (ObjectId.isValid(req.params.id)) {
-    db
-    .collection('movies')
-    .findOne({ _id: new ObjectId(req.params.id) })
-    .then((doc) => {
-      res
-        .status(200)
-        .json(doc);
-    })
-    .catch(() => handleError(res, 'Something goes wrong...'));
-  } else {
-    handleError(res, 'Wrong id');
-  }
+  Movie
+  .findById(req.params.id)
+  .then((movie) => {
+    res
+      .status(200)
+      .json(movie);
+  })
+  .catch(() => handleError(res, 'Something goes wrong...'));
 });
 
 app.delete('/movies/:id', (req, res) => {
-  if (ObjectId.isValid(req.params.id)) {
-    db
-    .collection('movies')
-    .deleteOne({ _id: new ObjectId(req.params.id) })
+    Movie
+    .findByIdAndDelete(req.params.id)
     .then((result) => {
       res
         .status(200)
         .json(result);
     })
     .catch(() => handleError(res, 'Something goes wrong...'));
-  } else {
-    handleError(res, 'Wrong id');
-  }
 });
 
 app.post('/movies', (req, res) => {
-  db
-  .collection('movies')
-  .insertOne(req.body)
+  const movie = new Movie(req.body);
+  movie
+  .save()
   .then((result) => {
     res
       .status(201)
@@ -80,17 +68,12 @@ app.post('/movies', (req, res) => {
 });
 
 app.patch('/movies/:id', (req, res) => {
-  if (ObjectId.isValid(req.params.id)) {
-    db
-    .collection('movies')
-    .updateOne({ _id: new ObjectId(req.params.id) }, { $set: req.body })
+    Movie
+    .findByIdAndUpdate(req.params.id, req.body)
     .then((result) => {
       res
         .status(200)
         .json(result);
     })
     .catch(() => handleError(res, 'Something goes wrong...'));
-  } else {
-    handleError(res, 'Wrong id');
-  }
 });
