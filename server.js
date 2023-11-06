@@ -33,7 +33,7 @@ app.get('/movies', (req, res) => {
         .status(200)
         .json(movies);
     })
-    .catch(handleError(res, 'Something goes wrong...'));
+    .catch(() => handleError(res, 'Something goes wrong...'));
 });
 
 app.get('/movies/:id', (req, res) => {
@@ -46,7 +46,7 @@ app.get('/movies/:id', (req, res) => {
         .status(200)
         .json(doc);
     })
-    .catch(handleError(res, 'Something goes wrong...'));
+    .catch(() => handleError(res, 'Something goes wrong...'));
   } else {
     handleError(res, 'Wrong id');
   }
@@ -62,7 +62,7 @@ app.delete('/movies/:id', (req, res) => {
         .status(200)
         .json(result);
     })
-    .catch(handleError(res, 'Something goes wrong...'));
+    .catch(() => handleError(res, 'Something goes wrong...'));
   } else {
     handleError(res, 'Wrong id');
   }
